@@ -1,0 +1,57 @@
+.dashboard-container {
+  display: flex;
+}
+
+.homepage {
+  flex: 1;
+  padding: 20px;
+}
+
+.file-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.file-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.file-item span {
+  margin-bottom: 5px;
+}
+
+.icon {
+  margin: 2px;
+  cursor: pointer;
+}
+
+.starred {
+  color: gold;
+}
+
+.convert-section {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.convert-btn {
+  background-color: #3498db;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.convert-btn:hover {
+  background-color: #2980b9;
+}
+

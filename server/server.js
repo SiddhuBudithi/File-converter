@@ -1,24 +1,38 @@
-// server/server.js
 const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const authRoutes = require("./routes/auth");
-const fileRoutes = require("./routes/file");
+const cors = require("cors");
+const path = require("path");
+const connectDB = require("./config/db");
 
 dotenv.config();
-
 const app = express();
-app.use(cors({ origin: "http://localhost:3000" }));
-app.use(express.json());
-
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log("MongoDB connected"))
-    .catch((err) => console.error("DB connection error:", err));
-
-app.use("/api/auth", authRoutes);
-app.use("/api/files", fileRoutes);
-
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Database connection
+connectDB();
+
+// Routes
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/files", require("./routes/fileRoutes"));
+
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+});
+
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PATCH, PUT, DELETE, OPTIONS"
+    );
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    );
+    next();
+});

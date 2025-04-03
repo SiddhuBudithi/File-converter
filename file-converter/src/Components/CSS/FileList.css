@@ -1,0 +1,57 @@
+.filelist-container {
+    margin: 20px;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filelist-title {
+    font-size: 1.5rem;
+    margin-bottom: 10px; 
+}
+
+.filelist-error {
+    color: red;
+    margin-bottom: 10px;
+}
+
+.filelist-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.filelist-table th, .filelist-table td {
+    padding: 12px 20px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.filelist-table th {
+    background-color: #9370DB;
+    color: white;
+    font-weight: bold;
+}
+
+.filelist-table tr:hover {
+    background-color: #e6e6e6;
+}
+
+.empty-folder {
+    text-align: center;
+    color: #555;
+    font-style: italic;
+}
+
+.download-button {
+    background-color: #4caf50;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.download-button:hover {
+    background-color: #45a049;
+}
