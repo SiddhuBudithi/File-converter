@@ -1,5 +1,13 @@
 import React from "react";
-import { FolderOpen, Star, Trash, Clock, Upload, Repeat, LogOut } from "lucide-react";
+import {
+  FolderOpen,
+  Star,
+  Trash,
+  Clock,
+  Upload,
+  Repeat,
+  LogOut,
+} from "lucide-react";
 import "../CSS/Sidebar.css";
 import { useNavigate } from "react-router-dom";
 
@@ -8,7 +16,7 @@ const Sidebar = ({ onSelect, onFileUpload }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/"); // Redirect to homepage after logout
+    navigate("/");
   };
   return (
     <div className="sidebar">
@@ -38,7 +46,7 @@ const Sidebar = ({ onSelect, onFileUpload }) => {
             style={{ display: "none" }}
           />
         </li>
-        {/* Convert File Button */}
+
         <li onClick={() => onSelect("convert")}>
           <Repeat className="icon" /> Convert File
         </li>

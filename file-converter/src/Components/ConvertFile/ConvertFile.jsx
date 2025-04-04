@@ -1,62 +1,79 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const ConvertFile = ({ files }) => {
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFileId, setSelectedFileId] = useState("");
   const [convertedFile, setConvertedFile] = useState(null);
-  const [message, setMessage] = useState("");
   const [conversionType, setConversionType] = useState("pdf-to-png");
 
   const handleConvert = async () => {
-    if (!selectedFile) {
-      alert("Please select a file first!");
+    if (!selectedFileId) {
+      toast.error("Please select a file first!");
       return;
     }
 
+    const selectedFile = files.find((file) => file._id === selectedFileId);
+    if (!selectedFile) {
+      toast.error("Selected file not found!");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", selectedFile.path);
+
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/files/convert/${selectedFile._id}`
+        `http://localhost:5000/api/files/convert/${conversionType}`,
+        formData,
+        { responseType: "blob" }
       );
-      setMessage(response.data.message);
-      setConvertedFile(response.data.path);
+
+      if (response.status === 200) {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        setConvertedFile(url);
+        toast.success("File converted successfully!");
+      } else {
+        toast.error("Conversion failed. Please try again.");
+      }
     } catch (error) {
-      console.error("Conversion failed:", error);
-      setMessage("Conversion failed. Please try again.");
+      console.error("File conversion failed:", error);
+      toast.error("Conversion failed. Please check the file format.");
     }
   };
 
   return (
     <div className="convert-file-container">
-      <h2 className="text-xl mb-2">Convert File</h2>
+      <h2>Convert File</h2>
+
       <select
         value={conversionType}
         onChange={(e) => setConversionType(e.target.value)}
-        className="mt-2 p-2 border rounded"
       >
         <option value="pdf-to-png">PDF to PNG</option>
         <option value="pdf-to-word">PDF to Word</option>
         <option value="word-to-pdf">Word to PDF</option>
-        <option value="img-to-pdf">Image to PDF</option>
-        <option value="pdf-to-img">PDF to Image</option>
+        <option value="html-to-pdf">Html to PDF</option>
       </select>
+
       <select
-        onChange={(e) =>
-          setSelectedFile(files.find((file) => file.name === e.target.value))
-        }
-        className="mt-2 p-2 border rounded"
+        value={selectedFileId}
+        onChange={(e) => setSelectedFileId(e.target.value)}
       >
-        <option>Select a file to convert</option>
-        {files.map((file, index) => (
-          <option key={index} value={file.name}>{file.name}</option>
+        <option value="">Select a file to convert</option>
+        {files.map((file) => (
+          <option key={file._id} value={file._id}>
+            {file.name}
+          </option>
         ))}
       </select>
-      <button onClick={handleConvert} className="bg-blue-500 text-white p-2 mt-2 rounded">
-        Convert
-      </button>
-      {message && <p className="mt-2 text-green-600">{message}</p>}
+
+      <button onClick={handleConvert}>Convert</button>
+
       {convertedFile && (
-        <div className="mt-4">
-          <a href={convertedFile} download className="text-green-600 underline">
+        <div>
+          <p>Conversion successful!</p>
+          <a href={convertedFile} download="converted_file">
             Download Converted File
           </a>
         </div>

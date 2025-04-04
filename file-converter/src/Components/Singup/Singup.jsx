@@ -41,7 +41,7 @@ const Signup = () => {
         password,
       });
       alert("Signup successful!");
-      navigate("/dashboard"); // Redirect to login page after successful signup
+      navigate("/dashboard");
     } catch (error) {
       alert("Signup failed!");
     }
@@ -51,7 +51,7 @@ const Signup = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="logo">
-        <img src={logo} alt="Twokey Logo" className="logo-image" />
+          <img src={logo} alt="Twokey Logo" className="logo-image" />
         </div>
         <h2>Create your TwoKey Account</h2>
 

@@ -4,6 +4,7 @@ import Login from './Components/Login/Login.jsx';
 import Signup from './Components/Singup/Singup.jsx';
 import Dashboard from './Components/Dashboard.jsx';
 import Homepage from './Pages/Homepage.jsx';
+import { ToastContainer } from "react-toastify";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -23,6 +24,18 @@ function App() {
                 } />
     <Route path="/signup" element={<Signup/>} />
     </Routes>
+     <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="dark"
+          />
     </BrowserRouter>
   );
 }
