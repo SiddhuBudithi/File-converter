@@ -5,8 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConvertFile from "./ConvertFile/ConvertFile";
 import { Download, Trash, Star } from "lucide-react";
-import "./CSS/Dashboard.css";
-import "./CSS/FileList.css";
+import "./CSS/Dashboard.css"; 
 
 const formatFileSize = (size) => {
   if (size < 1024) return `${size} B`;
@@ -148,6 +147,7 @@ const Dashboard = () => {
                 <td>{new Date(file.uploadDate).toLocaleDateString()}</td>
                 <td>{formatFileSize(file.size)}</td>
                 <td>
+                <div className="action-icons">
                   <button onClick={() => handleView(file)}>View</button>
                   <button onClick={() => handleDownload(file)}>
                     <Download className="icon" />
@@ -164,6 +164,7 @@ const Dashboard = () => {
                       <Trash className="icon" />
                     </button>
                   )}
+                  </div>
                 </td>
               </tr>
             ))

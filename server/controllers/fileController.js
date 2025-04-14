@@ -1,10 +1,9 @@
 const multer = require("multer");
 const path = require("path");
 const File = require("../models/File");
-const mammoth = require("mammoth");
-const pdfkit = require("pdfkit");
-const pdf = require("html-pdf");
 const fs = require("fs");
+const mime = require("mime-types");
+const axios = require("axios");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -82,7 +81,7 @@ const moveToTrash = async (req, res) => {
       return res.status(404).json({ message: "File not found" });
     }
     file.trash = true;
-    file.starred = false; 
+    file.starred = false;
     await file.save();
     res.json({ message: "File moved to trash" });
   } catch (error) {
@@ -114,98 +113,94 @@ const deleteFile = async (req, res) => {
 };
 
 const convertFile = async (req, res) => {
-  try {
-    const { conversionType } = req.params;
-    const file = req.file;
+  const { fileId } = req.body;
+  const { type } = req.params;
 
-    if (!file) {
-      return res.status(400).json({ message: "No file provided" });
+  if (!fileId) {
+    return res.status(400).json({ error: "Missing file ID." });
+  }
+
+  try {
+    const file = await File.findById(fileId);
+    if (!file || !fs.existsSync(file.path)) {
+      return res.status(404).json({ error: "File not found or path invalid." });
     }
 
-    const inputPath = path.join(__dirname, "../uploads", file.filename);
-    const outputPath = path.join(
-      __dirname,
-      "../uploads",
-      `converted_${file.filename}`
+    const apiKey = process.env.PDFCO_API_KEY;
+
+    const presignedUrlResponse = await axios.get(
+      `https://api.pdf.co/v1/file/upload/get-presigned-url?contenttype=application/octet-stream&name=${path.basename(
+        file.path
+      )}`,
+      { headers: { "x-api-key": apiKey } }
     );
 
-    switch (conversionType) {
-      case "pdf-to-png":
-        return res
-          .status(400)
-          .json({ message: "PDF to PNG conversion not supported." });
-
-      case "pdf-to-word":
-        try {
-          const arrayBuffer = fs.readFileSync(inputPath);
-          const result = await mammoth.convertToHtml({ buffer: arrayBuffer });
-          const wordFilePath = `${outputPath}.docx`;
-          fs.writeFileSync(wordFilePath, result.value);
-          return res.download(wordFilePath);
-        } catch (err) {
-          console.error("PDF to Word conversion failed:", err);
-          return res
-            .status(500)
-            .json({
-              message: "PDF to Word conversion failed",
-              error: err.message,
-            });
-        }
-
-      case "word-to-pdf":
-        try {
-          const wordContent = fs.readFileSync(inputPath, "utf8");
-          const pdfDoc = new pdfkit();
-          const pdfFilePath = `${outputPath}.pdf`;
-          pdfDoc.text(wordContent);
-          pdfDoc.pipe(fs.createWriteStream(pdfFilePath)).on("finish", () => {
-            return res.download(pdfFilePath);
-          });
-          pdfDoc.end();
-        } catch (err) {
-          console.error("Word to PDF conversion failed:", err);
-          return res
-            .status(500)
-            .json({
-              message: "Word to PDF conversion failed",
-              error: err.message,
-            });
-        }
-        break;
-
-      case "html-to-pdf":
-        try {
-          const htmlContent = fs.readFileSync(inputPath, "utf8");
-          const pdfFilePath = `${outputPath}.pdf`;
-          pdf.create(htmlContent).toFile(pdfFilePath, (err) => {
-            if (err) {
-              console.error("HTML to PDF conversion failed:", err);
-              return res
-                .status(500)
-                .json({
-                  message: "HTML to PDF conversion failed",
-                  error: err.message,
-                });
-            }
-            return res.download(pdfFilePath);
-          });
-        } catch (err) {
-          console.error("HTML to PDF conversion failed:", err);
-          return res
-            .status(500)
-            .json({
-              message: "HTML to PDF conversion failed",
-              error: err.message,
-            });
-        }
-        break;
-
-      default:
-        return res.status(400).json({ message: "Unsupported conversion type" });
+    if (presignedUrlResponse.data.error) {
+      return res
+        .status(500)
+        .json({ error: "Failed to retrieve presigned URL." });
     }
+
+    const uploadUrl = presignedUrlResponse.data.presignedUrl;
+
+    const fileData = fs.readFileSync(file.path);
+    await axios.put(uploadUrl, fileData, {
+      headers: {
+        "Content-Type": "application/octet-stream",
+      },
+    });
+
+    const uploadedFileUrl = presignedUrlResponse.data.url;
+
+    let conversionUrl = "";
+    if (type === "pdf-to-word") {
+      conversionUrl = "https://api.pdf.co/v1/pdf/convert/to/text";
+    } else if (type === "word-to-pdf") {
+      conversionUrl = "https://api.pdf.co/v1/pdf/convert/from/doc";
+    } else {
+      return res.status(400).json({ error: "Unsupported conversion type." });
+    }
+
+    const conversionPayload = {
+      name: `converted_file`,
+      async: false,
+      url: uploadedFileUrl,
+    };
+
+    const conversionResponse = await axios.post(
+      conversionUrl,
+      conversionPayload,
+      {
+        headers: { "x-api-key": apiKey },
+      }
+    );
+
+    if (conversionResponse.data.error) {
+      return res.status(500).json({ error: conversionResponse.data.message });
+    }
+
+    const convertedFileRes = await axios.get(conversionResponse.data.url, {
+      responseType: "arraybuffer",
+    });
+
+    const outputExt = type === "pdf-to-word" ? ".docx" : ".pdf";
+
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=converted${outputExt}`
+    );
+    res.setHeader(
+      "Content-Type",
+      mime.lookup(outputExt) || "application/octet-stream"
+    );
+
+    return res.send(convertedFileRes.data);
   } catch (error) {
-    console.error("Conversion error:", error);
-    res.status(500).json({ message: "Conversion error", error: error.message });
+    console.error(
+      "PDF.co conversion failed:",
+      error?.response?.data || error.message
+    );
+    res.status(500).json({ error: "An error occurred during conversion." });
   }
 };
 

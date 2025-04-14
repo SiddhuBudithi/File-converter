@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import "../CSS/ConvertFile.css"
 
 const ConvertFile = ({ files }) => {
   const [selectedFileId, setSelectedFileId] = useState("");
+  const [conversionType, setConversionType] = useState("pdf-to-word");
   const [convertedFile, setConvertedFile] = useState(null);
-  const [conversionType, setConversionType] = useState("pdf-to-png");
+  const [loading, setLoading] = useState(false);
 
   const handleConvert = async () => {
     if (!selectedFileId) {
@@ -13,19 +15,12 @@ const ConvertFile = ({ files }) => {
       return;
     }
 
-    const selectedFile = files.find((file) => file._id === selectedFileId);
-    if (!selectedFile) {
-      toast.error("Selected file not found!");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", selectedFile.path);
+    setLoading(true);
 
     try {
       const response = await axios.post(
         `http://localhost:5000/api/files/convert/${conversionType}`,
-        formData,
+        { fileId: selectedFileId },
         { responseType: "blob" }
       );
 
@@ -39,28 +34,30 @@ const ConvertFile = ({ files }) => {
     } catch (error) {
       console.error("File conversion failed:", error);
       toast.error("Conversion failed. Please check the file format.");
+    } finally {
+      setLoading(false); 
     }
   };
 
   return (
     <div className="convert-file-container">
-      <h2>Convert File</h2>
+      <h2>Convert Your File</h2>
 
+      <label>Select Conversion Type:</label>
       <select
         value={conversionType}
         onChange={(e) => setConversionType(e.target.value)}
       >
-        <option value="pdf-to-png">PDF to PNG</option>
-        <option value="pdf-to-word">PDF to Word</option>
-        <option value="word-to-pdf">Word to PDF</option>
-        <option value="html-to-pdf">Html to PDF</option>
+        <option value="pdf-to-word">PDF to Word (DOCX)</option>
+        <option value="word-to-pdf">Word (DOCX) to PDF</option>
       </select>
 
+      <label>Select File to Convert:</label>
       <select
         value={selectedFileId}
         onChange={(e) => setSelectedFileId(e.target.value)}
       >
-        <option value="">Select a file to convert</option>
+        <option value="">-- Select File --</option>
         {files.map((file) => (
           <option key={file._id} value={file._id}>
             {file.name}
@@ -68,12 +65,19 @@ const ConvertFile = ({ files }) => {
         ))}
       </select>
 
-      <button onClick={handleConvert}>Convert</button>
+      <button className="converting-btn"  onClick={handleConvert} disabled={loading}>
+        {loading ? "Converting..." : "Convert"}
+      </button>
 
       {convertedFile && (
-        <div>
+        <div style={{ marginTop: "10px" }}>
           <p>Conversion successful!</p>
-          <a href={convertedFile} download="converted_file">
+          <a
+            href={convertedFile}
+            download={`converted_file.${
+              conversionType === "pdf-to-word" ? "docx" : "pdf"
+            }`}
+          >
             Download Converted File
           </a>
         </div>

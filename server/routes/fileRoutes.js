@@ -20,8 +20,7 @@ router.patch("/:id/trash", moveToTrash);
 router.patch("/:id/star", toggleStar);
 router.delete("/:id", deleteFile);
 router.get("/view/:filename", viewFile);
-// router.post("/convert/:conversionType", convertFile);
-router.post("/convert/:conversionType", upload.single("file"), convertFile);
+router.post("/convert/:type", convertFile);
 
 module.exports = router;
  

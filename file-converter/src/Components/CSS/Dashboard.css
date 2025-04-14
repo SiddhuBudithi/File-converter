@@ -1,74 +1,118 @@
 .dashboard-container {
   display: flex;
+  min-height: 100vh;
 }
 
 .homepage {
   flex: 1;
-  padding: 20px;
+  padding: 2rem;
+  overflow-y: auto;
 }
 
-.file-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
-  margin: 10px 0;
+.homepage-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
 
-.file-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #f9f9f9;
+.filelist-container {
+  background-color: #fdfdfd;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
 }
 
-.file-item span {
-  margin-bottom: 5px;
+.filelist-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
 }
 
-.icon {
-  margin: 2px;
-  cursor: pointer;
+.filelist-table th,
+.filelist-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e1e1e1;
 }
 
-.starred {
-  color: gold;
+.filelist-table th {
+  background-color: #6c63ff;
+  color: white;
+  font-weight: 600;
 }
 
-.convert-section {
-  margin-top: 20px;
+.filelist-table th:last-child {
   text-align: center;
 }
 
-.convert-btn {
-  background-color: #3498db;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.filelist-table tr:hover {
+  background-color: #f9f9f9;
 }
 
-.convert-btn:hover {
-  background-color: #2980b9;
+.empty-folder {
+  text-align: center;
+  color: #777;
+  font-style: italic;
+  padding: 1rem;
 }
 
 .filelist-table button {
-  margin: 0 5px;
-  padding: 5px;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  color: #000000;
   border: none;
-  /* background-color: #007bff; */
-  /* color: white; */
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s;
+  background: none;
+  margin: 0 4px;
 }
 
 .filelist-table button:hover {
-  background-color: #0056b3;
+  transform: scale(1.1);
 }
 
-.filelist-table button:active {
-  transform: scale(0.95);
+.action-icons {
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  stroke: #555;
+  transition: color 0.2s ease;
+}
+
+.icon:hover {
+  stroke: #111;
+}
+
+.starred {
+  stroke: gold;
+}
+
+.icon.delete {
+  stroke: red;
+}
+
+.convert-file-section {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .filelist-table {
+    font-size: 0.9rem;
+  }
+
+  .homepage {
+    padding: 1rem;
+  }
+
+  .filelist-table th,
+  .filelist-table td {
+    padding: 8px 10px;
+  }
 }

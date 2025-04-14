@@ -1,0 +1,113 @@
+.convert-file-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  font-family: "Arial", sans-serif;
+}
+
+.convert-file-container h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  font-size: 16px;
+  color: #555;
+  margin: 10px 0 5px;
+}
+
+select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+}
+
+.converting-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #4caf50;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.converting-btn:hover {
+  background-color: #45a049;
+}
+
+.converting-btn:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+.converting-btn:disabled:hover {
+  background-color: #ddd;
+}
+
+a {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #fff;
+  background-color: #007bff;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+a:hover {
+  background-color: #0056b3;
+}
+
+a:focus {
+  outline: none;
+}
+
+.convert-file-container div {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.convert-file-container p {
+  font-size: 16px;
+  color: #4caf50;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .convert-file-container {
+    padding: 15px;
+  }
+
+  select,
+  .converting-btn,
+  a {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .convert-file-container {
+    padding: 10px;
+  }
+
+  select,
+  .converting-btn,
+  a {
+    font-size: 12px;
+  }
+}
